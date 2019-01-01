@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Source\MainFrm.cpp" />
+    <ClCompile Include="Source\MarginTabWnd.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="VisImgVideoProcToolApp.cpp" />
+    <ClCompile Include="Source\VisRightInstallPaneWnd.cpp">
+      <Filter>右侧窗口</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VisBottomResWnd.cpp">
+      <Filter>下侧资源窗口</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VisMessageManager.cpp">
+      <Filter>消息处理</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VisProcAdjustChildWnd.cpp">
+      <Filter>右侧算法窗口</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\VisProWnd.cpp">
+      <Filter>进度条</Filter>
+    </ClCompile>
+    <ClCompile Include="avCapSdk\CallBackVideo.cpp">
+      <Filter>capSdk</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Header\MainFrm.h" />
+    <ClInclude Include="Header\MarginTabWnd.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="VisImgVideoProcToolApp.h" />
+    <ClInclude Include="Header\VisRightInstallPaneWnd.h">
+      <Filter>右侧窗口</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\VisBottomResWnd.h">
+      <Filter>下侧资源窗口</Filter>
+    </ClInclude>
+    <ClInclude Include="struct.h" />
+    <ClInclude Include="Header\VisMessageManager.h">
+      <Filter>消息处理</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\VisProcAdjustChildWnd.h">
+      <Filter>右侧算法窗口</Filter>
+    </ClInclude>
+    <ClInclude Include="Header\VisProWnd.h">
+      <Filter>进度条</Filter>
+    </ClInclude>
+    <ClInclude Include="avCapSdk\CallBackVideo.h">
+      <Filter>capSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="avCapSdk\Def.h">
+      <Filter>capSdk</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VisImgVideoProcToolApp.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="右侧窗口">
+      <UniqueIdentifier>{798c3535-abcb-4428-b923-4554c2719837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="下侧资源窗口">
+      <UniqueIdentifier>{267569fc-90b6-4fd3-997a-dc03d9a96926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="消息处理">
+      <UniqueIdentifier>{f4fffe03-1642-421e-871e-783348e765f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="右侧算法窗口">
+      <UniqueIdentifier>{ba540ae7-1753-4f36-9766-8ee9eac4015a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="进度条">
+      <UniqueIdentifier>{72be9dcf-8fc6-40e1-9bdc-b5cfd673b8fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capSdk">
+      <UniqueIdentifier>{160ab1dc-298b-4ba5-8bc2-785ca6aa4f98}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\classview.bmp" />
+    <Image Include="res\classview_hc.bmp" />
+    <Image Include="res\class_view.ico" />
+    <Image Include="res\class_view_hc.ico" />
+    <Image Include="res\explorer.bmp" />
+    <Image Include="res\explorer_hc.bmp" />
+    <Image Include="res\fileview.bmp" />
+    <Image Include="res\fileview_hc.bmp" />
+    <Image Include="res\file_view.ico" />
+    <Image Include="res\file_view_hc.ico" />
+    <Image Include="res\menuimages.bmp" />
+    <Image Include="res\menuimages_hc.bmp" />
+    <Image Include="res\output_wnd.ico" />
+    <Image Include="res\output_wnd_hc.ico" />
+    <Image Include="res\properties.bmp" />
+    <Image Include="res\properties_hc.bmp" />
+    <Image Include="res\properties_wnd.ico" />
+    <Image Include="res\properties_wnd_hc.ico" />
+    <Image Include="res\sort.bmp" />
+    <Image Include="res\sort_hc.bmp" />
+    <Image Include="res\Toolbar256.bmp" />
+    <Image Include="res\VisTaskDispatchDetermineApp.ico" />
+    <Image Include="res\VisTaskDispatchDetermineAppDoc.ico" />
+    <Image Include="UserImages.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+</Project>
