@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window  roundcorner="2,2"  size="330,720"  >
+  <!--字体-->
+  <Font name="黑体" size="14" bold="true" />
+  <Font name="黑体" size="16" bold="true"/>
+  <Font name="宋体" size="12" bold="false" default="true" />
+  <VerticalLayout  bkcolor="#FF2f3032" bordercolor="#FF000000" bordersize="1" >
+    <!-- 按钮输出区 -->
+    <HorizontalLayout   bkcolor="#FF202020"  bordersize="1" bordercolor="#FF292929" >
+      <VerticalLayout>
+      <HorizontalLayout height="18" />
+      <HorizontalLayout height="24" >
+        <Control width="5"/>
+        <Label  width="90" showhtml="true" text="<i \\BatchImgVideoProc\\arch.png>" />
+        <Combo name="combo_arch"  textpadding="3,0,3,0" itemtextpadding="3,0,3,0"  dropboxbkcolor="#FF1A1A1A" dropboxbordercolor="#FF000000" normalimage="file='combo.png' source='0,0,130,23' corner='3,3,26,3'" hotimage="file='combo.png' source='130,0,260,23' corner='3,3,26,3'" pushedimage="file='combo.png' source='260,0,390,23' corner='3,3,26,3'" disabledimage="file='combo.png' source='390,0,520,23' corner='3,3,26,3'" itemtextcolor="#FFD0D0D0"  itemselectedtextcolor="#FFFFFFFF" itemselectedbkcolor="#FF484848" itemhottextcolor="#FF32EBFB" itemhotbkcolor="#FF2D2D2D" itemdisabledtextcolor="#FFCCCCCC" itemdisabledbkcolor="#FFFFFFFF">
+          <ListLabelElement name="cmd_bright" text="亮度、对比度调整"  selected="true" />
+          <ListLabelElement name="cmd_histogram" text="直方图调整" />
+          <ListLabelElement name="cmd_rotate" text="旋转" />
+          <ListLabelElement name="cmd_brightline" text="亮度曲线" />
+          <ListLabelElement name="cmd_gama" text="伽马" />
+        </Combo>
+        <Control width="10"/>
+      </HorizontalLayout>
+      <HorizontalLayout height="18" />
+      <HorizontalLayout >
+        <BindHwnd padding="1,1,1,1"  name="bind_ArchShow" />
+      </HorizontalLayout>
+    </VerticalLayout>
+    </HorizontalLayout>
+    <HorizontalLayout  height="125" bkcolor="#FF202020"  bordersize="1" bordercolor="#FF292929" >
+		<VerticalLayout name="inputsetting" visible="true">
+			<HorizontalLayout height="30" >
+				<Option name="opt_localVideo" group="optVideoMode" height="0"  tooltip="本地视频"  width="0"  selected="true" normalimage="file='sub.png' source='0,0,15,29' " hotimage="file='sub.png' source='15,0,30,29'" selectedimage="file='sub.png' source='30,0,45,29'" disabledimage="file='sub.png' source='45,0,60,29'"/>
+				<Control width="10"/>
+				<Option name="opt_realtimeVideo" group="optVideoMode" height="0"  tooltip="实时视频"  width="0"  normalimage="file='sub.png' source='0,0,15,29' " hotimage="file='sub.png' source='15,0,30,29' " selectedimage="file='sub.png' source='30,0,45,29'" disabledimage="file='sub.png' source='45,0,60,29'"/>
+			</HorizontalLayout>
+			<VerticalLayout name="localVideoMode" inset="10,10,10,10">
+				<Control height="10"/>
+				<Edit name="edit_exportfolder" textcolor="#FFFFFFFF" bkimage="file='edit.png' corner='5,5,5,5' mask='#FFFF00FF'"  height="23" padding="0,3,0,4" endellipsis="true"/>
+				<Control height="10" />
+				<Button name="btn_addfile" height="27"  tooltip="添加文件"  width="84"  normalimage="file='addfile.png' source='0,0,90,29' " hotimage="file='addfile.png' source='90,0,180,29' " pushedimage="file='addfile.png' source='180,0,270,29'" disabledimage="file='addfile.png' source='270,0,360,29'"/>
+				<Control height="10" />
+			</VerticalLayout>
+			<VerticalLayout name="realTimeVideoMode" visible="false" inset="10,10,10,10">
+				<Control height="0" />
+				<Button name="btn_connectRealtimeDev" height="27" textcolor="#FFFFFFFF" tooltip="链接设备" width="0" />
+				<Control height="0" />
+			</VerticalLayout>
+		</VerticalLayout>
+      <VerticalLayout name="outputsetting" visible="false"> 
+		  <HorizontalLayout height="5" />
+		  <HorizontalLayout height="25" >
+			<Control width="9"/>
+			<Label  textpadding="2,2,2,2"  showhtml="true" text="<i \\BatchImgVideoProc\\export.png><x 4><f 0>输出设置" textcolor="#FFFFFFFF"/>
+		  </HorizontalLayout>
+		  <HorizontalLayout height="0" />
+		  <HorizontalLayout height="30"  inset="2,0,2,0">
+			<Control width="9"/>
+			<Label width="55" textpadding="2,2,2,2"  text="保存到：" textcolor="#FFFFFFFF"/>
+			<Edit name="edit_exportfolder" textcolor="#FFFFFFFF" bkimage="file='edit.png' corner='5,5,5,5' mask='#FFFF00FF'"  height="23" padding="0,3,0,4" endellipsis="true"/>
+			<Control width="10" />
+			<Button name="btn_savefolder"  tooltip="选择输出目录"  width="60" height="23" padding="0,3,0,4" normalimage="file='liulan.png' source='0,0,60,23' " hotimage="file='liulan.png' source='60,0,120,23' " pushedimage="file='liulan.png' source='120,0,180,23'" disabledimage="file='liulan.png' source='180,0,240,23'" />
+			<Control width="3" />
+			<Button name="btn_opentransfolder"  tooltip="打开输出文件目录"  width="30" height="23" padding="0,3,0,4" normalimage="file='opentransfile.png' source='0,0,30,23' mask='#FFFF00FF " hotimage="file='opentransfile.png' source='30,0,60,23' " pushedimage="file='opentransfile.png' source='60,0,90,23'" disabledimage="file='opentransfile.png' source='90,0,120,23'" />
+			<Control width="9"/>
+		  </HorizontalLayout>
+
+		  <HorizontalLayout height="15" />
+		  
+		  <HorizontalLayout height="27" >
+			<Control width="9"/>
+			<Button name="btn_addfile" height="27"  tooltip="添加文件"  width="84"  normalimage="file='addfile.png' source='0,0,90,29' " hotimage="file='addfile.png' source='90,0,180,29' " pushedimage="file='addfile.png' source='180,0,270,29'" disabledimage="file='addfile.png' source='270,0,360,29'"/>
+			<Button name="btn_addfile_install" height="27"  tooltip="添加文件选择"  width="14"  normalimage="file='sub.png' source='0,0,15,29' " hotimage="file='sub.png' source='15,0,30,29' " pushedimage="file='sub.png' source='30,0,45,29'" disabledimage="file='sub.png' source='45,0,60,29'"/>
+			<Control width="9"/>
+			<Button name="btn_delfile" height="27"  tooltip="删除文件"  width="84"  normalimage="file='delfile.png' source='0,0,90,29' " hotimage="file='delfile.png' source='90,0,180,29' " pushedimage="file='delfile.png' source='180,0,270,29'" disabledimage="file='delfile.png' source='270,0,360,29'"/>
+			<Button name="btn_delfile_install" height="27"  tooltip="删除文件选择"  width="14"  normalimage="file='sub.png' source='0,0,15,29' " hotimage="file='sub.png' source='15,0,30,29' " pushedimage="file='sub.png' source='30,0,45,29'" disabledimage="file='sub.png' source='45,0,60,29'"/>
+			<Control width="9"/>
+			<Button name="btn_archexecute" height="27"  tooltip="执行算法"  width="84"  normalimage="file='execute.png' source='0,0,90,29' " hotimage="file='execute.png' source='90,0,180,29' " pushedimage="file='execute.png' source='180,0,270,29'" disabledimage="file='execute.png' source='270,0,360,29'"/>
+			<Button name="btn_archexecute_install" height="27"  tooltip="执行算法文件选择"  width="14"  normalimage="file='sub.png' source='0,0,15,29' " hotimage="file='sub.png' source='15,0,30,29' " pushedimage="file='sub.png' source='30,0,45,29'" disabledimage="file='sub.png' source='45,0,60,29'"/>
+			<Control width="9"/>
+		    </HorizontalLayout>
+		   <HorizontalLayout height="18" />
+    </VerticalLayout>
+    </HorizontalLayout>
+  </VerticalLayout>
+</Window>

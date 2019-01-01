@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- 默认风格属性 -->
+<DefaultSkin>
+    <!-- 菜单风格 -->
+	<Style name="menu"  inset="8,17,18,23" itemtextpadding="5,0,0,0" bkimage="file='menu_bk.png' corner='8,17,18,23'" itemalign="left" itemdisabledimage="file='menu_itemdis.png' corner='5,5,5,5'" itemselectedimage="file='menu_itemhot.png' corner='5,5,5,5'"  itemtextcolor="#FFD0D0D0" itemselectedtextcolor="#FF2DE7FB" submenuimage="file='submenu1.png'" itemdisabledtextcolor="#FF515151" />
+
+    <!-- 菜单项风格 -->
+    <Style name="menuelement" text="我是菜单项" />
+
+    <!-- 分割线风格 -->
+    <Style name="line" bkimage="file='line.png'" height="2" />
+</DefaultSkin>

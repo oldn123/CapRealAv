@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<Window xmlns="http://visystem/tags/duilib" size="240,280">
+
+  <Include source="..\..\..\Default/defaultskin.xml"></Include>
+
+          <TileLayout name="ListLayout"  childpadding="5" height="114" bkcolor="#88202020" bordercolor="#FF606060" itemsize="70,52" columns="3"> <!--vscrollbar="true"--> 
+            <!--亮度对比度--> 
+            <Button name="cmd_bright" text="" width="70" height="52" normalimage="file='fx\cmd_bright.png' corner='5,5,5,5' source='0,0,70,52'"  hotimage="file='fx\cmd_bright.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\cmd_bright.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--伽马--> 
+            <Button name="cmd_gama"           text=""      width="70" height="52" normalimage="file='fx\伽马调整.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\伽马调整.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\伽马调整.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--直方图调整-->
+            <Button name="cmd_histogram"      text=""  width="70" height="52" normalimage="file='fx\直方图调整.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\直方图调整.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\直方图调整.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--空间域锐化-->
+            <Button name="cmd_sharpen"        text="" width="70" height="52" normalimage="file='fx\空间域锐化.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\空间域锐化.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\空间域锐化.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--中值滤波-->
+            <Button name="cmd_midfilter"      text=""   width="70" height="52" normalimage="file='fx\中值滤波.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\中值滤波.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\中值滤波.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--奇偶场-->
+            <Button name="cmd_odd"            text=""      width="70" height="52" normalimage="file='fx\奇偶场.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\奇偶场.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\奇偶场.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--移行-->
+            <Button name="cmd_removeline"     text=""        width="70" height="52" normalimage="file='fx\移行.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\移行.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\移行.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--反色-->
+            <Button name="cmd_colorinverse"   text=""       width="70" height="52" normalimage="file='fx\反色.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\反色.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\反色.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--亮度反转-->
+            <Button name="cmd_brightinverse"  text=""   width="70" height="52" normalimage="file='fx\亮度反转.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\亮度反转.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\亮度反转.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--色调均化-->
+            <Button name="cmd_hueadj"         text=""    width="70" height="52" normalimage="file='fx\色调均化.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\色调均化.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\色调均化.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--旋转-->
+            <Button name="cmd_rotate"         text=""       width="70" height="52" normalimage="file='fx\旋转.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\旋转.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\旋转.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--镜头校正-->
+            <Button name="cmd_lense"          text=""     width="70" height="52" normalimage="file='fx\镜头校正.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\镜头校正.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\镜头校正.png' corner='5,5,5,5' source='140,0,210,52'"/>
+
+             <Button name="cmd_LDREnhance"  text=""   width="70" height="52" normalimage="file='fx\低照度.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\低照度.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\低照度.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--去雾-->
+            <Button name="cmd_removeFog"         text=""    width="70" height="52" normalimage="file='fx\去雾.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\去雾.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\去雾.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--针平均-->
+            <Button name="cmd_frameAvg"         text=""       width="70" height="52" normalimage="file='fx\针平均.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\针平均.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\针平均.png' corner='5,5,5,5' source='140,0,210,52'"/>
+            <!--稳定化-->
+            <Button name="cmd_stab"          text=""     width="70" height="52" normalimage="file='fx\稳定化.png' corner='5,5,5,5' source='0,0,70,52'" hotimage="file='fx\稳定化.png' corner='5,5,5,5' source='70,0,140,52'" pushedimage="file='fx\稳定化.png' corner='5,5,5,5' source='140,0,210,52'"/>     
+          </TileLayout>
+</Window>

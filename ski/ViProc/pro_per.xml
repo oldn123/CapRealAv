@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window caption="0,0,0,36" roundcorner="2,2"  size="600,200"  >
+  <!--字体-->
+  <Font name="黑体" size="14" bold="true" />
+  <Font name="黑体" size="16" bold="true"/>
+  <Font name="宋体" size="12" bold="false" default="true" />
+  
+  <VerticalLayout  bkcolor="#FF2f3032" bordercolor="#FF000000" bordersize="1" >
+    <!-- 标题栏区 -->
+    <HorizontalLayout name="header" height="36" bkcolor="#FF2f3032" bkimage="file='img_sys_title_dlg.bmp'"  bordersize="1" bordercolor="#FF000000" borderround="2,2">
+      <HorizontalLayout>
+        <Control width="10"/>
+        <Label name="titlename" showhtml="true" textpadding="0,2,0,2"  text="<f 1>进度提示"  textcolor="#FFFFFFFF" />
+      </HorizontalLayout>
+      <HorizontalLayout  width="39" >
+         <Button name="closebtn" tooltip="关闭"  height="20" width="20" padding="0,8,0,8" normalimage="file='close.png' source='0,0,20,20'" hotimage="file='close.png' source='20,0,40,20'" pushedimage="file='close.png' source='40,0,60,20'"/>
+      </HorizontalLayout>
+    </HorizontalLayout>
+    <!--客户区-->
+    <VerticalLayout name="body" bordersize="1" bordercolor="#FF000000"  bkcolor="#FF1A1A1A" inset="15,0,15,0">
+      <HorizontalLayout height="20" />
+      <HorizontalLayout height="30" >
+        <Progress name="pro_singlecnt"  height="22" padding="0,4,0,4" borderround="2,2" bkimage="file='pro_bk.png' corner='5,0,5,0'" foreimage="file='pro.png' corner='5,0,5,0'" value="50"/>
+        <Control width="15" />
+        <Label  name="lab_singleper" text="0.00%" font="0" textcolor="#FFFFFFFF"  width="60"/>
+      </HorizontalLayout>
+      <!--转码列表-->
+      <HorizontalLayout height="20" >
+        <Label  name="lab_filename" text="执行文件名称"  textcolor="#FFFFFFFF"  />
+      </HorizontalLayout>
+      <HorizontalLayout height="20" />
+      <HorizontalLayout height="30" >
+        <Progress name="pro_totalcnt"  height="22" padding="0,4,0,4" borderround="2,2" bkimage="file='pro_bk.png' corner='5,0,5,0'" foreimage="file='pro.png' corner='5,0,5,0'" value="50"/>
+        <Control width="15" />
+        <Label  name="lab_totalper" text="0.00%" font="0" textcolor="#FFFFFFFF"  width="60"/>
+      </HorizontalLayout>
+      <HorizontalLayout height="10" />    
+      <HorizontalLayout height="30" >
+        <Container />
+        <Button name="btn_cancel" height="26" padding="0,2,0,2"   width="60"  normalimage="file='cancel.png' source='0,0,60,26' mask='#FFFF00FF " hotimage="file='cancel.png' source='60,0,120,26' " pushedimage="file='cancel.png' source='120,0,180,26'" disabledimage="file='cancel.png' source='180,0,240,26'"/>
+          <Control width="20" />
+      </HorizontalLayout>
+    </VerticalLayout>
+  </VerticalLayout>
+</Window>

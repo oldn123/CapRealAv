@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<Window xmlns="http://visystem/tags/duilib" size="301,576">
+
+  <Include source="..\..\Default\defaultskin.xml"></Include>
+
+  <Default name="Label_NoText" value="padding=&quot;10,0,10,0&quot; float=&quot;false&quot; width=&quot;0&quot; height=&quot;14&quot; textcolor=&quot;#0000FFFF&quot;" />
+  <Default name="CloseBtn_small" value="fade=&quot;true&quot; width=&quot;6&quot; padding=&quot;0,0,0,0&quot; height=&quot;6&quot;  textcolor=&quot;#0000FFFF&quot; disabledtextcolor=&quot;#FFA7A6AA&quot; align=&quot;center&quot; normalimage=&quot;file=&apos;remove.png&apos; source=&apos;0,0,6,6&apos; corner=&apos;5,5,5,5&apos;&quot; hotimage=&quot;file=&apos;remove.png&apos; source=&apos;6,0,12,6&apos; corner=&apos;0,0,0,0&apos;&quot; pushedimage=&quot;file=&apos;remove.png&apos; source=&apos;12,0,18,6&apos; corner=&apos;5,5,5,5&apos;&quot;" />
+  <Default name="CheckBox_noText" value="fade=&quot;true&quot; float=&quot;false&quot; width=&quot;14&quot; height=&quot;14&quot; textcolor=&quot;#00FFFFFF&quot; normalimage=&quot;file=&apos;img_checkbox.png&apos; source=&apos;0,0,14,14&apos;&quot; hotimage=&quot;file=&apos;img_checkbox.png&apos; source=&apos;14,0,28,14&apos;&quot; selectedimage=&quot;file=&apos;img_checkbox.png&apos; source=&apos;56,0,70,14&apos;&quot; " />
+  <Default name="ListItem" value="fade=&quot;true&quot; borderround=&quot;5,5&quot; bordercolor=&quot;#FFFF0000&quot; float=&quot;false&quot; width=&quot;0&quot; height=&quot;20&quot; textcolor=&quot;#00FFFFFF&quot; bkimage=&quot;file=&apos;img_ListItem.png&apos; &quot;" />
+
+  <!--<Default name="Button" value=" width=&quot;60&quot; height=&quot;30&quot; padding=&quot;2,2,2,2&quot; textcolor=&quot;#0000FFFF&quot; disabledtextcolor=&quot;#FFA7A6AA&quot; align=&quot;center&quot; normalimage=&quot;file='soft_left_button_black.png' source='0,0,59,21' corner='5,5,5,5'&quot; hotimage=&quot;file='soft_left_button_black.png' source='59,0,118,21' corner='5,5,5,5'&quot; pushedimage=&quot;file='soft_left_button_black.png' source='118,0,177,21' corner='5,5,5,5'&quot; disabledimage=&quot;file='soft_left_button_black.png' source='177,0,236,21' corner='5,5,5,5'&quot;" />-->
+
+  <Default name="ItemButton" value="borderround=&quot;5,5&quot; bordercolor=&quot;#FFFF0000&quot; float=&quot;false&quot; width=&quot;128&quot; height=&quot;128&quot; textcolor=&quot;#00FFFFFF&quot;" />
+
+  <VerticalLayout bkcolor="#FF282828" bkcolor2="#FF323232" inset="10,10,10,0" bkimage="file='border.bmp' corner='10,10,10,10'">
+    <BindHwnd name="Bindwnd" bkcolor="#FF202020" bordercolor="#FF606060" padding="0,10,0,0"/>
+  </VerticalLayout>
+
+</Window>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window size="100,80">
+    <Include source="defaultstyle1.xml" />
+    <Font name="宋体" size="12" default="true"  />
+    <Style name="menu" itemfont="0" itemshowhtml="true" itemendellipsis="true" />
+    <Style name="menuelement" height="24" />
+    <Default name="MenuElement" value="style=&quot;menuelement&quot; " />
+    
+    <Menu style="menu" userdata="startmenu" >
+        <MenuElement name="addfile_only" text="添加文件" />       
+        <MenuElement name="addfile_directory" text="添加目录" />
+    </Menu>
+</Window>

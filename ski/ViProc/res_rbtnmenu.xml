@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window size="155,300">
+    <Include source="defaultstyle1.xml" />
+    <Font name="宋体" size="12" default="true"  />
+    <Style name="menu" itemfont="0" itemshowhtml="true" itemendellipsis="true" />
+    <Style name="menuelement" height="24" />
+    <Default name="MenuElement" value="style=&quot;menuelement&quot; " />
+    
+    <Menu style="menu" userdata="startmenu" >
+        <MenuElement name="del_cur" text="删除当前目标" />       
+        <MenuElement name="del_sel" text="删除选中目标" />
+        <MenuElement name="del_all" text="删除全部" />
+    </Menu>
+</Window>

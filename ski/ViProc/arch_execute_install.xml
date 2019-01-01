@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window size="100,120">
+    <Include source="defaultstyle1.xml" />
+    <Font name="宋体" size="12" default="true"  />
+    <Style name="menu" itemfont="0" itemshowhtml="true" itemendellipsis="true" />
+    <Style name="menuelement" height="24" />
+    <Default name="MenuElement" value="style=&quot;menuelement&quot; " />
+    
+    <Menu style="menu" userdata="startmenu" >
+        <MenuElement name="archexecute_cur" text="当前目标" />       
+        <MenuElement name="archexecute_sel" text="选中目标" />
+        <MenuElement name="archexecute_all" text="全部" />
+    </Menu>
+</Window>
