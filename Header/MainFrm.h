@@ -167,7 +167,7 @@ public:
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL LoadFrame(UINT nIDResource, DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, CWnd* pParentWnd = NULL, CCreateContext* pContext = NULL);
-
+	void		 OnSetImage(CdvImageInterface *);
 	virtual void	OnThreadWork(LPARAM, int *);
 // 实现
 public:
@@ -181,7 +181,8 @@ public:
 protected:
 	void			InitSubWnd();
 	void			InitStatusBar();
-
+	virtual void	GetBorderSize(int & nLeft, int & nRight, int & nBottom);
+	bool			OpenFile(LPCTSTR);
 // 生成的消息映射函数
 protected:
 	afx_msg void OnDestroy();
@@ -203,23 +204,19 @@ protected:
 protected:
 
 	void		AddDirectory(LPCTSTR lpszFolder);
-	void 	DeleteFile(Res_Info*	pActItem);
-	void 	DeleteFile(CItemInterface*	 pActItem);
+	void 		DeleteFile(Res_Info*	pActItem);
+	void 		DeleteFile(CItemInterface*	 pActItem);
 	void		DoMethod();
 	void		SetImageToShowWnd(CImageData* pImgData);
 	BOOL		InsertNewInfo(LPCTSTR lpszPath);
-	CString  GetDesFolder();
-	CString	GetDesPath(const CString&	srcPath,const CString& desFolder);
-	CString GetDesPath(const CString& srcPath);
+	CString		GetDesFolder();
+	CString		GetDesPath(const CString&	srcPath,const CString& desFolder);
+	CString		GetDesPath(const CString& srcPath);
 	void		SaveImgDesFile();
 	void		SaveVideoDesFile();
 	static void WINAPI ApplyMethodCallBack(int * pWorkMode, LPVOID pData);
 	void		IsDesFileExist(CString& strDesPath);
-	////testing code
-	//static void WINAPI DataComeCallback(double dblSampleTime, BYTE *pBuffer, long lBufferSize, PVOID lpParam);
-	//
-	//CVisVASoftEnCodec m_pEnCodec;
-	//CdvImageInterface*	m_pDesImg;
+
 	///////////////////
 protected:
 	BOOL					m_bTabMode;
@@ -236,6 +233,7 @@ protected:
 	CWorkThread			m_DoMethodThread;
 	HANDLE				m_hExitEvent;
 
+	CdvImageInterface * m_ImgForProc;
 	CVisProWnd*			m_pProWnd;
 };
 

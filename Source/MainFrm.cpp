@@ -63,7 +63,7 @@ CMainFrame::CMainFrame()
 	m_pThis = this;
 	m_pProWnd = NULL;
 
-//	m_pDesImg = NULL;
+	m_ImgForProc = ::GetCVImageInterface();
 }
 
 CMainFrame::~CMainFrame()
@@ -94,6 +94,11 @@ CMainFrame::~CMainFrame()
 	}
 } 
 
+class CMainVideoView : public CVisDuiTwoImageWnd
+{
+
+};
+
 void CMainFrame::InitSubWnd()
 {
 	CRect rcClient;
@@ -110,23 +115,17 @@ void CMainFrame::InitSubWnd()
 	m_pRightDockPane->DockToFrameWindow(CBRS_LEFT);
 
 
-// 	m_pBottomDockPane = new CVisDockPane();
-// 	m_pBottomDockPane->Create(L"BottomDockPane", this, CRect(0,0,800,120),FALSE,IDR_PANE_BOTTOM_WND,WS_VISIBLE | WS_CHILD | CBRS_BOTTOM);
-// 	//下方资源窗口
-// 	m_pBottomResWnd = new CVisBottomResWnd();
-// 	m_pBottomResWnd->SetMsgWnd(this);
-// 	m_pBottomResWnd->Create(this,IDR_PANE_BOTTOM_WND);
-// 	m_pBottomResWnd->GetFrameOpr()->ShowOprBar(FALSE);
-// 	m_pBottomDockPane->SetSubWnd(m_pBottomResWnd);
-// 	m_pBottomDockPane->DockToFrameWindow(CBRS_BOTTOM);
-
 	//主窗口
-	m_pMainImgWnd = new CVisDuiMultiImageWnd();
+	m_pMainImgWnd = new CMainVideoView();
 	if (m_pMainImgWnd)
 	{
 		m_pMainImgWnd->Create(this->GetSafeHwnd(),_T(""),WS_VISIBLE | WS_CHILD,0);
 		m_pMainImgWnd->SetShowConvSeqControl(false);
 		GetChildView()->SetSubWnd(m_pMainImgWnd->GetCWnd());
+		m_pMainImgWnd->SetViewMode(DOUBLEVIEW);
+		m_pMainImgWnd->GetRenderDC(0)->SetBrotherGroupName(L"abc");
+		m_pMainImgWnd->GetRenderDC(1)->SetBrotherGroupName(L"abc");
+
 		if (m_pRightPane)
 		{
 			m_pRightPane->SetActiveRendWnd(m_pMainImgWnd->GetRenderDC());
@@ -198,9 +197,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CMainFrame::OnRealtimeVideoCallback(int nDevIdx, CdvImageInterface * pImage)
 {
-// 	m_pMainImgWnd->GetRenderDC(0)->SetImageHeader();
-// 	m_pMainImgWnd->GetRenderDC(0)->SetImageData(pImage->GetData());
 	m_pMainImgWnd->GetRenderDC(0)->SetImagePtr(pImage);
+	OnSetImage(pImage);
 }
 
 void CMainFrame::OnErrorCatch(int nErr)
@@ -341,6 +339,11 @@ LRESULT	CMainFrame::OnSelectItem(WPARAM wp, LPARAM lp)
 	return 0;
 }
 
+bool CMainFrame::OpenFile(LPCTSTR strFile)
+{
+	return InsertNewInfo(strFile);
+}
+
 LRESULT CMainFrame::OnOpenFile(WPARAM wParam, LPARAM lParam)
 {
 	//打开文件类型
@@ -350,7 +353,7 @@ LRESULT CMainFrame::OnOpenFile(WPARAM wParam, LPARAM lParam)
 	strPath.Format(L"%s",path.c_str());
 	strPath.Replace(L"|",L";");
 	TCHAR tchFilter[512];
-	swprintf_s(tchFilter,512,L"图片|*.jpg;*.jpeg;*.png;*.bmp;gif|视频|%s|其它|*.*||",strPath);
+	swprintf_s(tchFilter,512,L"视频|*.mp4|其它|*.*||",strPath);
 
 	CFileDialog dlgFileOpen(TRUE, 
 		NULL, 
@@ -370,9 +373,18 @@ LRESULT CMainFrame::OnOpenFile(WPARAM wParam, LPARAM lParam)
 	while(pos_file != NULL)
 		ary_filename.push_back(dlgFileOpen.GetNextPathName(pos_file));
 	CWaitCursor waitcur;
-	for (int i = 0;i<ary_filename.size();i++)
+
+
+	if (wParam && ary_filename.size() > 0)
 	{
-		InsertNewInfo(ary_filename.at(i));
+		if (OpenFile((LPCTSTR)ary_filename.at(0)))
+		{
+			_tcscpy((LPTSTR)wParam, (LPCTSTR)ary_filename.at(0));
+		}
+		else
+		{
+			MessageBox(NULL, L"打开文件失败", L"提示", 0);
+		}
 	}
 
 	return 0;
@@ -411,6 +423,24 @@ LRESULT CMainFrame::OnOpenDirectory(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void WINAPI funImageProcessCallback(void* pParam,CdvImageInterface* pImage,int nPos)
+{
+
+}
+
+void WINAPI funImagePreProcessCallback(void* pParam,CdvImageInterface* pImage,CdvImageInterface* pDestImage,int nPos)
+{
+	CMainFrame * pThis = (CMainFrame *)pParam;
+	pDestImage->Copy(*pImage);
+	pThis->OnSetImage(pDestImage);
+}
+
+void CMainFrame::OnSetImage(CdvImageInterface * pImg)
+{
+	m_ImgForProc->Copy(*pImg);
+	m_pMainImgWnd->GetRenderDC(1)->SetImage(m_ImgForProc, true);
+}
+
 BOOL CMainFrame::InsertNewInfo( LPCTSTR lpszPath )
 {
 	CString strPath(lpszPath);
@@ -428,21 +458,38 @@ BOOL CMainFrame::InsertNewInfo( LPCTSTR lpszPath )
 			::MessageBox(m_hWnd,_T("不支持三维文件！"),_T("提示"),MB_OK);
 			return FALSE;
 		}
-		Res_Info* pInfo = new Res_Info;
+		if (m_pBottomResWnd)
+		{
+			Res_Info* pInfo = new Res_Info;
 		
-		pInfo->strPath = strPath;
-		pInfo->pData = pData;
-		m_vecRes.push_back(pInfo);
-		//界面添加
-		int nIndex = m_pBottomResWnd->AddItem(pInfo->strPath,pInfo->pData->GetPreviewData(),(LPVOID)pInfo);
-		CItemInterface * pItem = m_pBottomResWnd->GetFrameOpr()->GetItem(nIndex);
-		pItem->SetFontColor(false, RGB(169,169,169));
-		pItem->SetFontColor(true, RGB(255,255,255));
-		m_pBottomResWnd->GetFrameOpr()->SelectItem(0,0,nIndex);
-		m_pBottomResWnd->Invalidate();
+			pInfo->strPath = strPath;
+			pInfo->pData = pData;
+			m_vecRes.push_back(pInfo);
+			//界面添加
+			int nIndex = m_pBottomResWnd->AddItem(pInfo->strPath,pInfo->pData->GetPreviewData(),(LPVOID)pInfo);
+			CItemInterface * pItem = m_pBottomResWnd->GetFrameOpr()->GetItem(nIndex);
+			pItem->SetFontColor(false, RGB(169,169,169));
+			pItem->SetFontColor(true, RGB(255,255,255));
+			m_pBottomResWnd->GetFrameOpr()->SelectItem(0,0,nIndex);
+			m_pBottomResWnd->Invalidate();
+		}
+		else
+		{
+			m_pMainImgWnd->SetData(pData);
+			m_pMainImgWnd->GetImageDataPlay()->SetImageProcessCallBack(funImageProcessCallback, this);
+			m_pMainImgWnd->GetImageDataPlay()->SetImagePreProcessCallBack(funImagePreProcessCallback, this);
+		}
 		return TRUE;
 	}
 	return FALSE;
+}
+
+void CMainFrame::GetBorderSize(int & nLeft, int & nRight, int & nBottom)
+{
+	return __super::GetBorderSize(nLeft, nRight, nBottom);
+	nLeft = 20;
+	nRight = 20;
+	nBottom= 20;
 }
 
 void CMainFrame::AddDirectory( LPCTSTR lpszFolder )

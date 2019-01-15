@@ -102,7 +102,12 @@ void CCallBackVideo::OnThreadProc(HWND hWnd, int * pStatus)
 			{
 				break;
 			}
-			ASSERT(nDevCnt == 1);
+
+			if(nDevCnt < 1)
+			{
+				break;
+			}
+
 			if (wcslen(wszDeviceName) < 1 && AVerGetDeviceName(nDevIdx, wszDeviceName) != CAP_EC_SUCCESS)
 			{
 				break;

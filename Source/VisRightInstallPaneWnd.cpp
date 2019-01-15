@@ -119,6 +119,7 @@ void CVisRightInstallPaneWnd::InitWindow()
 
 	m_pMethodPanel= new CFxAdjPane_FIEx(this->m_hWnd, this->m_hWnd);
 	m_pMethodPanel->Create(GetCWnd());
+	m_pMethodPanel->ShowWindow(false);
 	//BindHwnd°ó¶¨¿Ø¼þ
 	m_pBindWnd = (CBindHwndUI*)m_PaintManager.FindControl(_T("bind_ArchShow"));
 	m_pBindWnd->SetBind(m_pMethodPanel->GetHWND());
@@ -204,7 +205,14 @@ void CVisRightInstallPaneWnd::OpenDesFolder( LPCTSTR lpszPath )
 
 void CVisRightInstallPaneWnd::OnBtnAddFile()
 {
-	CVisMessageManager::GetMsgHander()->SendMessage(MSG_ADDFILE,0,0);
+	TCHAR sFileBuf[MAX_PATH] = {0};
+	CVisMessageManager::GetMsgHander()->SendMessage(MSG_ADDFILE, (WPARAM)&sFileBuf[0],0);
+
+	if (_tcslen(sFileBuf) > 0)
+	{
+		m_PaintManager.FindControl(L"edit_inputFile")->SetText(sFileBuf);
+	}
+
 }
 
 void CVisRightInstallPaneWnd::OnBtnDesFolder()

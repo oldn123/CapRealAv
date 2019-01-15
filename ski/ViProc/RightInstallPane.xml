@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window  roundcorner="2,2"  size="330,720"  >
+<Include source="../Default/defaultskin.xml"></Include>
   <!--字体-->
   <Font name="黑体" size="14" bold="true" />
   <Font name="黑体" size="16" bold="true"/>
@@ -57,7 +58,7 @@
 		  <HorizontalLayout height="30"  inset="2,0,2,0">
 			<Control width="9"/>
 			<Label width="55" textpadding="2,2,2,2"  text="保存到：" textcolor="#FFFFFFFF"/>
-			<Edit name="edit_exportfolder" textcolor="#FFFFFFFF" bkimage="file='edit.png' corner='5,5,5,5' mask='#FFFF00FF'"  height="23" padding="0,3,0,4" endellipsis="true"/>
+			<Edit name="edit_inputFile" textcolor="#FFFFFFFF" bkimage="file='edit.png' corner='5,5,5,5' mask='#FFFF00FF'"  height="23" padding="0,3,0,4" endellipsis="true"/>
 			<Control width="10" />
 			<Button name="btn_savefolder"  tooltip="选择输出目录"  width="60" height="23" padding="0,3,0,4" normalimage="file='liulan.png' source='0,0,60,23' " hotimage="file='liulan.png' source='60,0,120,23' " pushedimage="file='liulan.png' source='120,0,180,23'" disabledimage="file='liulan.png' source='180,0,240,23'" />
 			<Control width="3" />
