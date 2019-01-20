@@ -198,7 +198,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 void CMainFrame::OnRealtimeVideoCallback(int nDevIdx, CdvImageInterface * pImage)
 {
 	m_pMainImgWnd->GetRenderDC(0)->SetImagePtr(pImage);
-	OnSetImage(pImage);
+	m_ImgForProc->Copy(*pImage);
+	OnSetImage(m_ImgForProc);
 }
 
 void CMainFrame::OnErrorCatch(int nErr)
@@ -432,13 +433,14 @@ void WINAPI funImagePreProcessCallback(void* pParam,CdvImageInterface* pImage,Cd
 {
 	CMainFrame * pThis = (CMainFrame *)pParam;
 	pDestImage->Copy(*pImage);
+	pThis->m_ImgForProc->Copy(*pDestImage);
+	CVisCommonApi::ExchangeHeight(pThis->m_ImgForProc->GetData(), pThis->m_ImgForProc->GetStep(), pThis->m_ImgForProc->Height());
 	pThis->OnSetImage(pDestImage);
 }
 
 void CMainFrame::OnSetImage(CdvImageInterface * pImg)
 {
-	m_ImgForProc->Copy(*pImg);
-	m_pMainImgWnd->GetRenderDC(1)->SetImage(m_ImgForProc, true);
+	m_pMainImgWnd->GetRenderDC(1)->SetImage(m_ImgForProc, false);
 }
 
 BOOL CMainFrame::InsertNewInfo( LPCTSTR lpszPath )

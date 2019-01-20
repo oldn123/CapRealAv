@@ -233,8 +233,9 @@ protected:
 	CWorkThread			m_DoMethodThread;
 	HANDLE				m_hExitEvent;
 
-	CdvImageInterface * m_ImgForProc;
 	CVisProWnd*			m_pProWnd;
+public:
+	CdvImageInterface * m_ImgForProc;
 };
 
 
