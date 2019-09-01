@@ -8,11 +8,13 @@
 #include "../Resource.h"
 #include "../Header/VisMessageManager.h"
 #include "../Header/VisBottomResWnd.h"
-#include "../Header/VisRightInstallPaneWnd.h"
+
 #include "../Header/VisProWnd.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+#define UM_CHANGEUIMODE	WM_USER + 991
 
 // CMainFrame
 #define	OPENFILESCOUNT 30
@@ -34,6 +36,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, __BaseFrame)
 	ON_MESSAGE(MSG_DELFILE,OnDeleteFile)
 	ON_MESSAGE(MSG_DOMETHOD,OnDoMethod)
 	ON_MESSAGE(MSG_DOMETHOD_CANCLE,OnDoMethodCancel)
+	ON_MESSAGE(UM_CHANGEUIMODE,OnChangeUIMode)
 	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)	
 
 	ON_WM_SETTINGCHANGE()
@@ -63,7 +66,13 @@ CMainFrame::CMainFrame()
 	m_pThis = this;
 	m_pProWnd = NULL;
 
-	m_ImgForProc = ::GetCVImageInterface();
+
+	m_pImgZoomed	= ::GetCVImageInterface();
+	m_pImgDenoiseLit= ::GetCVImageInterface();
+	m_pImgDenoise	= ::GetCVImageInterface();
+	m_ImgForProc	= ::GetCVImageInterface();
+
+	m_params.nScl = -1;
 }
 
 CMainFrame::~CMainFrame()
@@ -99,6 +108,54 @@ class CMainVideoView : public CVisDuiTwoImageWnd
 
 };
 
+LRESULT CMainFrame::OnChangeUIMode(WPARAM wp, LPARAM lp)
+{
+	m_pMainImgWnd->RefreshUI(IMAGE_DATA);
+	return 0;
+}
+
+void CMainFrame::OnParamChanged(int type, bool buse, int val)
+{
+	switch (type)
+	{
+	case -1:
+		{
+			m_pRightPane->GetParams(m_params);
+		}
+		break;
+	case 0:
+		{
+			m_params.bUseAddNoise = buse;	
+			m_params.nNoise = (float)val / 10.0f;
+			if (m_pImgZoomed->IsValid())
+			{
+				ResetParams(m_pImgZoomed->Width(), m_pImgZoomed->Height(), m_miSimulator, m_gProc, m_params);
+			}
+		}
+		break;
+	case 1:
+		{
+			m_params.bUseBM3D = buse;
+			m_params.fDenosie = val;
+			if (m_pImgZoomed->IsValid())
+			{
+				ResetParams(m_pImgZoomed->Width(), m_pImgZoomed->Height(), m_miSimulator, m_gProc, m_params);
+			}
+		}
+		break;
+	case 2:
+		{
+			m_params.bUseSSR = buse;
+			m_params.nScl = val;
+			if (m_pImgZoomed->IsValid())
+			{
+				ResetParams(m_pImgZoomed->Width(), m_pImgZoomed->Height(), m_miSimulator, m_gProc, m_params);
+			}
+		}
+		break;
+	}
+}
+
 void CMainFrame::InitSubWnd()
 {
 	CRect rcClient;
@@ -109,7 +166,7 @@ void CMainFrame::InitSubWnd()
 	m_pRightDockPane->Create(L"RightDockPane", this, CRect(0,0,330,720),FALSE,IDR_RIGHT_PANE,WS_VISIBLE | WS_CHILD | CBRS_RIGHT);
 	
 	//右侧配置窗口
-	m_pRightPane = new CVisRightInstallPaneWnd();
+	m_pRightPane = new CVisRightInstallPaneWnd(this);
 	m_pRightPane->Create(m_hWnd, _T("VisRightInstallPaneWnd"),UI_WNDSTYLE_CHILD , 0);
 	m_pRightDockPane->SetSubWnd(m_pRightPane->GetCWnd());
 	m_pRightDockPane->DockToFrameWindow(CBRS_LEFT);
@@ -119,7 +176,7 @@ void CMainFrame::InitSubWnd()
 	m_pMainImgWnd = new CMainVideoView();
 	if (m_pMainImgWnd)
 	{
-		m_pMainImgWnd->Create(this->GetSafeHwnd(),_T(""),WS_VISIBLE | WS_CHILD,0);
+		m_pMainImgWnd->Create(this->GetSafeHwnd(),_T(""), WS_CHILD,0);
 		m_pMainImgWnd->SetShowConvSeqControl(false);
 		GetChildView()->SetSubWnd(m_pMainImgWnd->GetCWnd());
 		m_pMainImgWnd->SetViewMode(DOUBLEVIEW);
@@ -140,8 +197,21 @@ void CMainFrame::OnThreadWork(LPARAM, int * pStatus)
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+	lpCreateStruct->style &= ~WS_VISIBLE;
 	if (__BaseFrame::OnCreate(lpCreateStruct) == -1)
 		return -1;
+
+	AfxGetApp()->m_nCmdShow=SW_HIDE;
+
+	m_params.bUseAddNoise	= true;
+	m_params.bUseBM3D	= true;
+	m_params.bUseSSR	= true;
+	m_params.fDenosie	= 50.0f;
+	m_params.nScl		= 2;
+	m_params.nNoise		= 0.3; //噪声方差 0.3
+
+	m_params.szOutImgSize.nWidth = 0;
+	m_params.szOutImgSize.nHeight = 0;
 
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CVisVisualManager));
 
@@ -161,7 +231,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 	else
 	{
-		ModifyStyle(0, WS_MAXIMIZEBOX | WS_MINIMIZEBOX);
+		ModifyStyle(WS_VISIBLE, WS_MAXIMIZEBOX | WS_MINIMIZEBOX);
 		//m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 		//SetIcon(m_hIcon);
 	}
@@ -184,8 +254,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		InitStatusBar();
 	}
 
-	CVisVisualManager::GetInstance()->AdjustFrames();
-	RedrawWindow(NULL, NULL, RDW_ALLCHILDREN | RDW_INVALIDATE | RDW_UPDATENOW | RDW_FRAME | RDW_ERASE);
+// 	CVisVisualManager::GetInstance()->AdjustFrames();
+// 	RedrawWindow(NULL, NULL, RDW_ALLCHILDREN | RDW_INVALIDATE | RDW_UPDATENOW | RDW_FRAME | RDW_ERASE);
 
 
 	CCallBackVideo::GetInstance()->SetCallbackNotify(this);
@@ -194,12 +264,187 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	return 0;
 }
 
+bool CMainFrame::InitFrame(int cx, int cy)
+{
+	if (m_pImgZoomed->IsValid())
+	{
+		m_pImgZoomed->Destory();
+	}
+
+	return ResetParams(cx, cy, m_miSimulator, m_gProc, m_params) == 0;
+}
+
+int CMainFrame::ResetParams(int nSrcWidth, int nSrcHeight, CMilliWaveSimulator & miSimulator,  CdvGpuProcSdk & gProc, sParams & params)
+{
+	CVisAutoLock lk(&m_lkChangeParam);
+
+	bool bfirst = params.fnAlgs.size() < 1;
+
+	float * fDenoiseParams = &params.fDenoiseParams[0];// { params.fDenosie, 5.0f, 5.0f, 3.0f, 1.0f, 1.0f };   // 去噪声的参数，第一个参数需要节目展示，名称：噪声强度，范围是1-100
+	float * fInterpParams = &params.fInterpParams[0];// { 7.0f };									 // 超分辨率的参数
+
+	fDenoiseParams[0]	= params.fDenosie;
+	fDenoiseParams[1]	= 5.0f;
+	fDenoiseParams[2]	= 5.0f;
+	fDenoiseParams[3]	= 3.0f;
+	fDenoiseParams[4]	= 1.0f;
+	fDenoiseParams[5]	= 1.0f;
+
+	fInterpParams[0]	= 7.0f;
+
+	int nScl = params.nScl;														 // 超分辨率的放大倍数，名称：放大倍数，只支持2-3倍，界面需要展示
+
+	double fzoom = (double)nSrcWidth / 320.f;
+
+	if (fzoom < 1)
+	{
+		fzoom = 1;
+	}
+
+	nSrcWidth = nSrcWidth / fzoom;
+	nSrcHeight= nSrcHeight / fzoom;
+
+	params.szZoomImgSize.nWidth = nSrcWidth;
+	params.szZoomImgSize.nHeight = nSrcHeight;
+
+	// 配置算法的参数，VIDEO_BM3D-去噪声，VIDEO_SSR_MKL-超分辨率
+	std::pair<enum eAlgoType, bool> alg1(VIDEO_BM3D, params.bUseBM3D), alg2(VIDEO_SSR_MKL, params.bUseSSR);
+	vector<std::pair<enum eAlgoType, bool>> & fnAlgs = params.fnAlgs;
+	int nRet = 0;
+	if(bfirst)
+	{
+		// check whether support CUDA device
+		if (gProc.GetGpuInformation()) {
+			return -1;
+		}
+
+		// 加入去噪声的算法
+		nRet = gProc.AddGpuAlgorithm(VIDEO_BM3D, 6, fDenoiseParams);
+		if ( !nRet ) {
+			fnAlgs.push_back(alg1);
+		}
+
+		// 加入超分辨率的算法
+		nRet = gProc.AddGpuAlgorithm(VIDEO_SSR_MKL, 1, fInterpParams);
+		if ( !nRet ) {
+			fnAlgs.push_back(alg2);
+		}
+	}
+	else
+	{
+		gProc.ReSetAlgorithmParams(VIDEO_BM3D, fDenoiseParams, 6);
+
+		gProc.ReSetAlgorithmParams(VIDEO_SSR_MKL, fInterpParams, 1);
+
+		fnAlgs.clear();
+		fnAlgs.push_back(alg1);
+		fnAlgs.push_back(alg2);
+	}
+
+
+	// 图像处理类初始化
+	nRet = gProc.ReInitialize2(nSrcWidth, nSrcHeight, 3, 0, NULL, nScl, nScl);
+	if (nRet != 0) {
+		return nRet;
+	}
+	WriteLogEx(L"resetparam1 %d, %d, %d", nRet, nSrcWidth, nSrcHeight);
+	// 图像仿真类初始化
+
+	nRet = miSimulator.ReInitilize(nSrcWidth, nSrcHeight, 3);
+
+	params.szOutImgSize.nWidth = nSrcWidth * nScl;
+	params.szOutImgSize.nHeight = nSrcHeight * nScl;
+
+	WriteLogEx(L"resetparam2 %d", nRet);
+
+	return 0;
+}
+
+void CMainFrame::OnImageFrame(CdvImageInterface * pImage, CdvImageInterface * pDestImage)
+{
+	CVisAutoLock lk(&m_lkChangeParam);
+
+	if(!m_pImgZoomed->IsValid())
+	{
+		m_pImgZoomed->Create(m_params.szZoomImgSize, 8, 3);
+
+		if (m_pImgDenoise->IsValid())
+		{
+			m_pImgDenoise->Destory();
+		}
+		m_pImgDenoise->Create(m_params.szZoomImgSize, 8, 3);
+
+
+		if (m_pImgDenoiseLit->IsValid())
+		{
+			m_pImgDenoiseLit->Destory();
+		}
+		m_pImgDenoiseLit->Create(m_params.szZoomImgSize, 8, 3);
+	}
+
+	//缩放
+	fnImageResize(pImage->GetData(), pImage->Width(), pImage->Height(), m_pImgZoomed->GetData(), m_pImgZoomed->Width(), m_pImgZoomed->Height());
+
+
+	CdvImageInterface * pImageSrc = m_pImgZoomed;
+	CdvImageInterface * pImageForProc = m_pImgZoomed;
+
+
+	// 仿真生成噪声，第一个是输入图像，第二个是噪声比较大的图像，第三个是噪声比较小的图像，界面要显示第二个参数，名称：噪声方差，范围0-1
+	if (m_params.bUseAddNoise)
+	{
+		SimuStatus nRet = m_miSimulator.SimuMilliwaveNoise(pImageSrc->GetData(), m_pImgDenoise->GetData(), m_pImgDenoiseLit->GetData(), 0.2, m_params.nNoise);
+		if (nRet == ssNoError)
+		{
+			pImageSrc = m_pImgDenoise;
+			if (m_params.bUseBM3D)
+			{
+				pImageForProc = m_pImgDenoiseLit;
+			}
+			else
+			{
+				pImageForProc = m_pImgDenoise;
+			}
+		}
+	}
+		
+	pDestImage->Copy(*pImageSrc);
+
+
+
+	if(!m_ImgForProc->IsValid() || m_ImgForProc->Width() != m_params.szOutImgSize.nWidth || m_ImgForProc->Height() != m_params.szOutImgSize.nHeight)
+	{
+		m_ImgForProc->Destory();
+		m_ImgForProc->Create(m_params.szOutImgSize, 8, 3);
+	}
+
+	// 视频处理函数，第二个参数是输入图像，第一个参数是输出图像
+	m_gProc.RunGpuAlgorithm(m_ImgForProc->GetData(), pImageForProc->GetData(), m_params.fnAlgs);
+
+	OnSetImage(m_ImgForProc);
+
+	//WriteLogEx(L"on frame 3~~~");
+}
+
+void CMainFrame::OnSetImage(CdvImageInterface * pImg)
+{
+	m_pMainImgWnd->GetRenderDC(1)->SetImage(pImg, false);
+}
+
 
 void CMainFrame::OnRealtimeVideoCallback(int nDevIdx, CdvImageInterface * pImage)
 {
-	m_pMainImgWnd->GetRenderDC(0)->SetImagePtr(pImage);
-	m_ImgForProc->Copy(*pImage);
-	OnSetImage(m_ImgForProc);
+	if (m_params.fnAlgs.size() < 1)
+	{
+		PostMessage(UM_CHANGEUIMODE, 0, 0);
+
+		InitFrame(pImage->Width(), pImage->Height());
+	}
+
+	CdvImageInterface * pDstImg = ::GetCVImageInterface();
+	OnImageFrame(pImage, pDstImg);
+	m_pMainImgWnd->GetRenderDC(0)->SetImage(pDstImg);
+	::ReleaseCVImageInterface(&pDstImg);
 }
 
 void CMainFrame::OnErrorCatch(int nErr)
@@ -218,6 +463,15 @@ void CMainFrame::OnDevDiscover(int nIdx, LPCTSTR name, int nType)
 	}
 }
 
+LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
+{
+	if (message == WM_WINDOWPOSCHANGING)
+	{
+		TRACE(L"");
+	}
+	return __super::WindowProc( message, wParam, lParam);
+}
+
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
 //	if (m_bTabMode)
@@ -225,7 +479,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 		cs.hMenu = NULL;
 	}
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
-
+	cs.style &= ~WS_VISIBLE;
 	if( !__BaseFrame::PreCreateWindow(cs) )
 		return FALSE;
 	return TRUE;
@@ -235,6 +489,13 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 
 void CMainFrame::OnDestroy()
 {
+	_exit(0);
+	m_pMainImgWnd->CloseData(0);
+	CImageDataManager::GetInstance()->CloseAll();
+	CCallBackVideo::GetInstance()->Stop();
+	CCallBackVideo::GetInstance()->Release();
+
+
 	//CImportVideoMgr::DeleteImportList();
 	WriteLog(_T("CMainFrame::OnDestroy..."));
 
@@ -289,10 +550,16 @@ void CMainFrame::OnUpdateApplicationLook(CCmdUI* pCmdUI)
 BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParentWnd, CCreateContext* pContext) 
 {
 	// 基类将执行真正的工作
+
+	dwDefaultStyle &= ~WS_VISIBLE;
+
 	if (!__BaseFrame::LoadFrame(nIDResource, dwDefaultStyle, pParentWnd, pContext))
 	{
 		return FALSE;
 	}
+
+	SetIcon(LoadIcon(AfxGetInstanceHandle(), MAKEINTRESOURCE(IDR_MAINFRAME)));
+
 	return TRUE;
 }
 
@@ -432,15 +699,21 @@ void WINAPI funImageProcessCallback(void* pParam,CdvImageInterface* pImage,int n
 void WINAPI funImagePreProcessCallback(void* pParam,CdvImageInterface* pImage,CdvImageInterface* pDestImage,int nPos)
 {
 	CMainFrame * pThis = (CMainFrame *)pParam;
-	pDestImage->Copy(*pImage);
-	pThis->m_ImgForProc->Copy(*pDestImage);
-	CVisCommonApi::ExchangeHeight(pThis->m_ImgForProc->GetData(), pThis->m_ImgForProc->GetStep(), pThis->m_ImgForProc->Height());
-	pThis->OnSetImage(pDestImage);
+	CVisCommonApi::ExchangeHeight(pImage->GetData(), pImage->GetStep(), pImage->Height());
+	pThis->OnImageFrame(pImage, pDestImage);
 }
 
-void CMainFrame::OnSetImage(CdvImageInterface * pImg)
+bool CMainFrame::OnStartRealPlay()
 {
-	m_pMainImgWnd->GetRenderDC(1)->SetImage(m_ImgForProc, false);
+	m_pMainImgWnd->CloseData(0);
+	CImageDataManager::GetInstance()->CloseAll();
+	if (!CCallBackVideo::GetInstance()->Start())
+	{
+		::MessageBoxW(GetSafeHwnd(), L"连接设备失败！", L"提示", 0);
+		return false;
+	}
+
+	return true;
 }
 
 BOOL CMainFrame::InsertNewInfo( LPCTSTR lpszPath )
@@ -450,6 +723,8 @@ BOOL CMainFrame::InsertNewInfo( LPCTSTR lpszPath )
 	{
 		//添加文件
 		CImageData* pData = CImageDataManager::GetInstance()->AddImageData(strPath);
+		pData->UseImageFilter(false);
+
 		if (!pData)
 		{
 			::MessageBox(m_hWnd,_T("文件打开错误！"),_T("提示"),MB_OK);
@@ -477,6 +752,12 @@ BOOL CMainFrame::InsertNewInfo( LPCTSTR lpszPath )
 		}
 		else
 		{
+			CCallBackVideo::GetInstance()->Stop();
+			
+			InitFrame(pData->GetData()->Width(), pData->GetData()->Height());
+
+			m_pRightPane->SetUIStatus(true);
+
 			m_pMainImgWnd->SetData(pData);
 			m_pMainImgWnd->GetImageDataPlay()->SetImageProcessCallBack(funImageProcessCallback, this);
 			m_pMainImgWnd->GetImageDataPlay()->SetImagePreProcessCallBack(funImagePreProcessCallback, this);

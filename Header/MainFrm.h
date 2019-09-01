@@ -7,7 +7,7 @@
 #include "..\struct.h"
 #include "VisProWnd.h"
 #include "..\avCapSdk\CallBackVideo.h"
-
+#include "../Header/VisRightInstallPaneWnd.h"
 class CMainFrame;
 class CInvestBaseFrame;
 class CInvestFrameWnd;
@@ -143,19 +143,21 @@ public:
 	virtual BOOL SaveState(LPCTSTR lpszProfileName = NULL, int nIndex = -1, UINT uiID = (UINT) -1){return FALSE;}
 };
 
-
 #define USE_MAP
 #define __BaseFrame	CVisImgDockFrame
 class CVisBottomResWnd;
 class CVisRightInstallPaneWnd;
 class CVisProWnd;
-class CMainFrame : public __BaseFrame, public CWorkThreadLoading, public IRealtimeDevCallback
+class CMainFrame : public __BaseFrame, public CWorkThreadLoading, public IRealtimeDevCallback, public ICmdParamNotify
 {
 	
 protected: // 仅从序列化创建
 	virtual void OnRealtimeVideoCallback(int nDevIdx, CdvImageInterface * pImage);
 	virtual void OnDevDiscover(int nIdx, LPCTSTR name, int nType);
 	virtual void OnErrorCatch(int);
+	virtual void OnParamChanged(int type, bool buse, int val);
+	virtual bool OnStartRealPlay();
+
 // 特性
 public:
 	CMainFrame();
@@ -168,6 +170,7 @@ public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL LoadFrame(UINT nIDResource, DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, CWnd* pParentWnd = NULL, CCreateContext* pContext = NULL);
 	void		 OnSetImage(CdvImageInterface *);
+	void		 OnImageFrame(CdvImageInterface *, CdvImageInterface *);
 	virtual void	OnThreadWork(LPARAM, int *);
 // 实现
 public:
@@ -176,7 +179,6 @@ public:
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
-
 
 protected:
 	void			InitSubWnd();
@@ -200,6 +202,7 @@ protected:
 	//资源列表
 	LRESULT			OnSelectItem(WPARAM wp, LPARAM lp);
 	LRESULT			OnDbclkItem(WPARAM wp, LPARAM lp);
+	LRESULT			OnChangeUIMode(WPARAM wp, LPARAM lp);
 	DECLARE_MESSAGE_MAP()
 protected:
 
@@ -216,7 +219,9 @@ protected:
 	void		SaveVideoDesFile();
 	static void WINAPI ApplyMethodCallBack(int * pWorkMode, LPVOID pData);
 	void		IsDesFileExist(CString& strDesPath);
-
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
+	bool		InitFrame(int cx, int cy);
+	int ResetParams(int nSrcWidth, int nSrcHeight, CMilliWaveSimulator & miSimulator,  CdvGpuProcSdk & gProc, sParams & params);
 	///////////////////
 protected:
 	BOOL					m_bTabMode;
@@ -235,7 +240,23 @@ protected:
 
 	CVisProWnd*			m_pProWnd;
 public:
+
+	sParams m_params;
+
+
+	CdvImageInterface * m_pImgZoomed;
+	CdvImageInterface * m_pImgDenoiseLit;
+	CdvImageInterface * m_pImgDenoise;
 	CdvImageInterface * m_ImgForProc;
+
+	CMilliWaveSimulator m_miSimulator;
+	// 视频处理的类
+	CdvGpuProcSdk		m_gProc;
+
+	float				m_fDenoiseParams[6];   // 去噪声的参数，第一个参数需要节目展示，名称：噪声强度，范围是1-100
+	float				m_fInterpParams[1];	   // 超分辨率的参数
+	int					m_nScl;		
+	CVisCritSec			m_lkChangeParam;
 };
 
 

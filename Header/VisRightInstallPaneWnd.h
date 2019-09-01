@@ -1,9 +1,34 @@
 #pragma once
+
+struct sParams
+{
+	float	fDenosie;
+	int		nScl;
+	float	nNoise; //噪声方差 0.3
+	bool	bUseAddNoise;
+	bool	bUseBM3D;
+	bool	bUseSSR;
+
+	float fDenoiseParams[6];	// 去噪声的参数，第一个参数需要节目展示，名称：噪声强度，范围是1-100
+	float fInterpParams[1];		// 超分辨率的参数
+
+	dvSize	szZoomImgSize;
+	dvSize	szOutImgSize;
+	vector<std::pair<enum eAlgoType, bool>> fnAlgs;
+};
+
+class ICmdParamNotify
+{
+public:
+	virtual void OnParamChanged(int type, bool buse, int val)	= 0;
+	virtual bool OnStartRealPlay()								= 0;
+};
+
 class CFxAdjPane_FIEx;
 class CVisRightInstallPaneWnd : public CVisDuiWndBase,public DuiLib::IMenuNoifyUI
 {
 public:
-	CVisRightInstallPaneWnd();
+	CVisRightInstallPaneWnd(ICmdParamNotify*);
 	~CVisRightInstallPaneWnd(); 
 	CString  GetDesFolder();
 	void		SetUIStatus(BOOL bCanStart);
@@ -12,6 +37,8 @@ public:
 	CImageFilterManager*	GetImageFilterManager();
 	void		setRealTimeDevInfo(int ,LPCTSTR ,int);
 	void		OnRealTimeDevErrorCatch(int);
+
+	void		GetParams(sParams &);
 public:
 	virtual DuiLib::CDuiString GetSkinFile();
 	LPCTSTR			GetWindowClassName() const;
@@ -20,6 +47,8 @@ public:
 	virtual void		OnClick(TNotifyUI& msg);
 	virtual void		MenuNotify(CDuiString strMenuCmd, CDuiString strUserData, UINT nTag);
 	virtual void		MenuNotifyForType(CDuiString strMenuCmd, CDuiString strUserData, UINT nTag, UINT uType);
+	virtual HRESULT		HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
+
 protected:
 	void				OnBtnAddFile();
 	void				OnBtnAddFile_Install();
@@ -70,4 +99,6 @@ protected:
 	CImageData*		m_pImgData;
 	CFxRenderWnd*		m_pFxRenderWnd;
 	CFxRenderWnd*		m_pTempFxRenderWnd;
+
+	ICmdParamNotify * m_pParamNotify;
 };

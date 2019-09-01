@@ -288,14 +288,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "图像视频批处理小工具\n\nVisTaskDispatch\n\n\nVisTaskDispatchDetermineApp.Document\nVisTaskDispatchDetermineApp.Document"
+    IDR_MAINFRAME           "毫米波视频仿真工具\n\nDispatch\n\n\nDocument\n毫米波视频仿真工具"
 END
-
-
 
 STRINGTABLE
 BEGIN
-    AFX_IDS_APP_TITLE       "图像视频批处理小工具V1.0"
+    AFX_IDS_APP_TITLE       "毫米波视频仿真工具V1.0"
     AFX_IDS_IDLEMESSAGE     "就绪"
 END
 

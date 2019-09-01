@@ -27,7 +27,6 @@ public:
 	void	SetCallbackNotify(IRealtimeDevCallback * p){m_pIRealtimeNotify = p;}
 	bool	Start();
 	bool	Stop();
-
 protected:
 	bool	InnerStart();
 	bool	InnerStop();
@@ -41,4 +40,6 @@ protected:
 	IRealtimeDevCallback *		m_pIRealtimeNotify;
 	HANDLE						m_hEvtForStart;
 	HANDLE						m_hEvtForStop;
+	CVisCritSec					m_lkFrame;
+	bool						m_bHasRunning;
 };

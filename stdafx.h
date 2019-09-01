@@ -44,7 +44,38 @@
 #include ".\avCapSdk\AVerCapAPI_Pro.h"
 #include ".\avCapSdk\def.h"
 
-#pragma comment(lib, "AVerCapAPI.lib");
+#pragma comment(lib, "AVerCapAPI.lib")
+
+
+#include <vector>
+#include <list>
+
+// TODO:  在此处引用程序需要的其他头文件
+#include "opencv.hpp"
+
+#ifdef _DEBUG
+#pragma comment(lib, "opencv_core2410d.lib")
+#pragma comment(lib, "opencv_highgui2410d.lib")
+#pragma comment(lib, "opencv_imgproc2410d.lib")
+#else
+#pragma comment(lib, "opencv_core2410.lib")
+#pragma comment(lib, "opencv_highgui2410.lib")
+#pragma comment(lib, "opencv_imgproc2410.lib")
+#endif
+
+#include "GpuIVProcessor.h"
+#include "MilliWaveSimulator.h"
+
+// #ifdef _DEBUG
+// #pragma comment(lib, "GpuIVProcessord.lib")
+// #pragma comment(lib, "MilliWaveSimulatord.lib")
+// #else
+// #pragma comment(lib, "GpuIVProcessor.lib")
+// #pragma comment(lib, "MilliWaveSimulator.lib")
+// #endif // DEBUG
+
+#pragma comment(lib, "GpuIVProcessor.lib")
+#pragma comment(lib, "MilliWaveSimulator.lib")
 
 #include <vector>
 using namespace std;

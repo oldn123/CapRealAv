@@ -10,7 +10,7 @@
 #define	ALGCNT		3 //最多支持3个算法
 
 
-CVisRightInstallPaneWnd::CVisRightInstallPaneWnd()
+CVisRightInstallPaneWnd::CVisRightInstallPaneWnd(ICmdParamNotify * p) : m_pParamNotify(p)
 {
 	m_pComboArchInstall = NULL;		
 	m_pBtnAddFile = NULL;		
@@ -62,6 +62,19 @@ void CVisRightInstallPaneWnd::OnRealTimeDevErrorCatch(int nErr)
 	}
 }
 
+HRESULT CVisRightInstallPaneWnd::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	if (uMsg == WM_USER + 128)
+	{
+		if (m_pParamNotify)
+		{
+			m_pParamNotify->OnParamChanged(LOWORD(wParam), HIWORD(wParam), lParam);
+		}
+	}
+
+	return __super::HandleCustomMessage(uMsg, wParam, lParam, bHandled);
+}
+
 void CVisRightInstallPaneWnd::Notify( TNotifyUI& msg )
 {
 
@@ -84,14 +97,63 @@ void CVisRightInstallPaneWnd::Notify( TNotifyUI& msg )
 	__super::Notify(msg);
 	if (_tcscmp(curType, DUI_MSGTYPE_SELECTCHANGED)==0)
 	{
+		if (curName == L"use_addnoise")
+		{
+			bool baddnoise = ((CCheckBoxUI*)msg.pSender)->GetCheck();
+			m_PaintManager.FindControl(L"sliderNoisely")->SetVisible(baddnoise);	
+
+			::PostMessage(GetSafeHwnd(), WM_USER + 128, MAKELONG(0, baddnoise), ((CSliderUI *)m_PaintManager.FindControl(L"sliderNoise"))->GetValue());
+		}
+		else if (curName == L"use_denoise")
+		{
+			bool bdenoise = ((CCheckBoxUI*)msg.pSender)->GetCheck();
+			m_PaintManager.FindControl(L"sliderdeNoisely")->SetVisible(bdenoise);	
+
+			::PostMessage(GetSafeHwnd(), WM_USER + 128, MAKELONG(1, bdenoise), ((CSliderUI *)m_PaintManager.FindControl(L"sliderdeNoise"))->GetValue());
+		}
+		else
 		if (curName == L"opt_localVideo" ||
 			curName == L"opt_realtimeVideo")
 		{
 			m_PaintManager.FindControl(L"localVideoMode")->SetVisible(curName == L"opt_localVideo");
 			m_PaintManager.FindControl(L"realTimeVideoMode")->SetVisible(curName == L"opt_realtimeVideo");
-		}	
+		}
+		else if (curName == L"use_zoom1")
+		{
+			::PostMessage(GetSafeHwnd(), WM_USER + 128, MAKELONG(2,1), 1);
+		}
+		else if (curName == L"use_zoom2")
+		{
+			::PostMessage(GetSafeHwnd(), WM_USER + 128, MAKELONG(2, 1), 2);
+		}
+		else if (curName == L"use_zoom3")
+		{
+			::PostMessage(GetSafeHwnd(), WM_USER + 128, MAKELONG(2,1), 3);
+		}
 	}
+	else if (_tcscmp(curType, DUI_MSGTYPE_VALUECHANGED)==0)
+	{
+		if (curName == L"sliderNoise")
+		{
+			CSliderUI * pslder = (CSliderUI *)msg.pSender;
+			::PostMessage(GetSafeHwnd(), WM_USER + 128, MAKELONG(0, pslder->IsVisible()), pslder->GetValue());
+		}
+		else if (curName == L"sliderdeNoise")
+		{
+			CSliderUI * pslder = (CSliderUI *)msg.pSender;
+			::PostMessage(GetSafeHwnd(), WM_USER + 128, MAKELONG(1, pslder->IsVisible()), pslder->GetValue());
+		}
+	}
+}
 
+void CVisRightInstallPaneWnd::GetParams(sParams & param)
+{
+	param.bUseAddNoise	= ((CCheckBoxUI*)m_PaintManager.FindControl(L"use_addnoise"))->GetCheck();
+	param.bUseBM3D		= ((CCheckBoxUI*)m_PaintManager.FindControl(L"use_denoise"))->GetCheck();
+	param.bUseSSR		= ((COptionUI*)m_PaintManager.FindControl(L"use_zoom1"))->IsSelected() ? false : true;
+	param.nNoise		= ((CSliderUI*)m_PaintManager.FindControl(L"sliderNoise"))->GetValue();
+	param.fDenosie		= ((CSliderUI*)m_PaintManager.FindControl(L"sliderdeNoise"))->GetValue();
+	param.nScl			= ((COptionUI*)m_PaintManager.FindControl(L"use_zoom1"))->IsSelected() ? 1 : ((COptionUI*)m_PaintManager.FindControl(L"use_zoom2"))->IsSelected() ? 2 : 3;
 }
 
 void CVisRightInstallPaneWnd::InitWindow()
@@ -111,37 +173,52 @@ void CVisRightInstallPaneWnd::InitWindow()
 	TCHAR path[255];
 	SHGetSpecialFolderPath(0,path,CSIDL_COMMON_DOCUMENTS,0);
 	CString strMyDoc(path);
-	strMyDoc += _T("\\图像视频批量处理输出目录");
+	strMyDoc += _T("\\");
 	m_strDesFolder = strMyDoc;
 	m_pEditDesFolder->SetText(m_strDesFolder);
 //	SetUIStatus(FALSE);
 
 
-	m_pMethodPanel= new CFxAdjPane_FIEx(this->m_hWnd, this->m_hWnd);
-	m_pMethodPanel->Create(GetCWnd());
-	m_pMethodPanel->ShowWindow(false);
+
 	//BindHwnd绑定控件
 	m_pBindWnd = (CBindHwndUI*)m_PaintManager.FindControl(_T("bind_ArchShow"));
-	m_pBindWnd->SetBind(m_pMethodPanel->GetHWND());
-	if (m_pImgData)
+	if (m_pBindWnd)
 	{
-		m_pMethodPanel->SetImageFilterMgr(m_pImgData->GetImageFilter());
+		m_pMethodPanel= new CFxAdjPane_FIEx(this->m_hWnd, this->m_hWnd);
+		m_pMethodPanel->Create(GetCWnd());
+		m_pMethodPanel->ShowWindow(false);
+		m_pBindWnd->SetBind(m_pMethodPanel->GetHWND());	
+		if (m_pImgData)
+		{
+			m_pMethodPanel->SetImageFilterMgr(m_pImgData->GetImageFilter());
+		}
 	}
 
 	if (m_PaintManager.FindControl(L"btn_connectRealtimeDev"))
 	{
 		m_PaintManager.FindControl(L"btn_connectRealtimeDev")->SetText(L"正在尝试连接设备...");
 	}
+
+	m_PaintManager.FindControl(L"sliderNoisely")->SetVisible(((CCheckBoxUI*)m_PaintManager.FindControl(L"use_addnoise"))->GetCheck());	
+
+	m_PaintManager.FindControl(L"sliderdeNoisely")->SetVisible(((CCheckBoxUI*)m_PaintManager.FindControl(L"use_denoise"))->GetCheck());	
+
+
+	if (m_pParamNotify)
+	{
+		m_pParamNotify->OnParamChanged(-1, 0,0);
+	}
 }
 
 void CVisRightInstallPaneWnd::OnConnectRealTimeDev()
 {
-	if (!CCallBackVideo::GetInstance()->Start())
+	if (m_pParamNotify)
 	{
-		MessageBoxW(GetSafeHwnd(), L"连接设备失败！", L"提示", 0);
+		if (m_pParamNotify->OnStartRealPlay())
+		{
+			m_PaintManager.FindControl(L"btn_connectRealtimeDev")->SetEnabled(false);
+		}
 	}
-
-	m_PaintManager.FindControl(L"btn_connectRealtimeDev")->SetEnabled(false);
 }
 
 void CVisRightInstallPaneWnd::OnClick( TNotifyUI& msg )
@@ -210,7 +287,10 @@ void CVisRightInstallPaneWnd::OnBtnAddFile()
 
 	if (_tcslen(sFileBuf) > 0)
 	{
-		m_PaintManager.FindControl(L"edit_inputFile")->SetText(sFileBuf);
+		if (m_PaintManager.FindControl(L"edit_inputFile"))
+		{
+			m_PaintManager.FindControl(L"edit_inputFile")->SetText(sFileBuf);
+		}
 	}
 
 }
@@ -395,34 +475,7 @@ CString CVisRightInstallPaneWnd::SelTransDir()
 
 void CVisRightInstallPaneWnd::SetUIStatus( BOOL bCanStart )
 {
-	if (bCanStart)
-	{
-		m_pComboArchInstall->SetEnabled(FALSE);	
-		m_pBtnAddFile->SetEnabled(FALSE);		
-		m_pBtnAddFile_Install->SetEnabled(FALSE);
-		m_pBtnDelFile->SetEnabled(FALSE);		
-		m_pBtnDelFile_Install->SetEnabled(FALSE);
-		m_pBtnExecute->SetEnabled(TRUE);		
-		m_pBtnExecute_Install->SetEnabled(TRUE);
-
-		m_pBtnDesFolder->SetEnabled(FALSE);		
-		m_pBtnOpenDesFolder->SetEnabled(FALSE);	
-		m_pEditDesFolder->SetEnabled(FALSE);	
-	}
-	else
-	{
-		m_pComboArchInstall->SetEnabled(TRUE);	
-		m_pBtnAddFile->SetEnabled(TRUE);		
-		m_pBtnAddFile_Install->SetEnabled(TRUE);
-		m_pBtnDelFile->SetEnabled(TRUE);		
-		m_pBtnDelFile_Install->SetEnabled(TRUE);
-		m_pBtnExecute->SetEnabled(FALSE);		
-		m_pBtnExecute_Install->SetEnabled(FALSE);
-
-		m_pBtnDesFolder->SetEnabled(TRUE);		
-		m_pBtnOpenDesFolder->SetEnabled(TRUE);	
-		m_pEditDesFolder->SetEnabled(TRUE);	
-	}
+	m_PaintManager.FindControl(L"btn_connectRealtimeDev")->SetEnabled(bCanStart);
 }
 
 DuiLib::CDuiString CVisRightInstallPaneWnd::GetSkinFile()

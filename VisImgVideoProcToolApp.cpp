@@ -51,6 +51,53 @@ CVisImgVideoProcToolApp::CVisImgVideoProcToolApp()
 CVisImgVideoProcToolApp theApp;
 
 
+class CStartPage : public CVisDuiWndBase
+{
+public:
+	CStartPage(CWnd * p){
+		m_pFrameWnd = p;
+		m_timecnt = 3;
+	}
+	virtual ~CStartPage(){
+
+	}
+
+	LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		if( uMsg == WM_TIMER ) 
+		{
+			m_timecnt--;
+			if (m_timecnt < 1)
+			{
+				KillTimer(wParam);
+				Close();
+			}
+		}
+		return __super::HandleMessage( uMsg, wParam, lParam );
+	}
+
+	virtual LRESULT OnDestroy(UINT u1, WPARAM w2, LPARAM w3, BOOL& bHandled){
+		if (m_pFrameWnd && m_pFrameWnd->GetSafeHwnd())
+		{
+			m_pFrameWnd->SetWindowPos(NULL, 0,0,0,0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+		}
+		return __super::OnDestroy(u1, w2, w3, bHandled);
+	}
+
+	virtual CDuiString GetSkinFile() override{
+		return L"BatchImgVideoProc\\startpage.xml";
+	}
+
+	virtual void InitWindow() override{
+		SetTimer(1000, 1000);
+	}
+
+protected:
+	CWnd *	m_pFrameWnd;
+	int		m_timecnt;
+};
+
+
 BOOL CVisImgVideoProcToolApp::InitInstance()
 {
 	LONG lRet = AVerInitialize();
@@ -123,12 +170,20 @@ BOOL CVisImgVideoProcToolApp::InitInstance()
 	}
 
 
- 	CMainFrame* pFrame = new CMainFrame;
+	CMainFrame* pFrame = new CMainFrame;
+
+	static CStartPage sp(pFrame);
+	sp.CreateDuiWindow();
+	sp.CenterWindow();
+	//sp.ShowWindow(SW_SHOW);
+	sp.ShowModal();
+ 
  	if (!pFrame)
  		return FALSE;
  	m_pMainWnd = pFrame;
+	UINT ss = WS_OVERLAPPEDWINDOW	 | FWS_ADDTOTITLE;
  	pFrame->LoadFrame(IDR_MAINFRAME,
- 		WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, NULL,
+ 	ss, NULL,
  		NULL);
  	pFrame->ShowWindow(SW_SHOW);
  	pFrame->UpdateWindow();

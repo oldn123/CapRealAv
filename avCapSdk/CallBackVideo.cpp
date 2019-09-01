@@ -23,6 +23,7 @@ void CCallBackVideo::Release()
 
 CCallBackVideo::CCallBackVideo()
 {
+	m_bHasRunning = false;
 	ZeroMemory(&m_VideoCaptureInfo, sizeof(VIDEO_CAPTURE_INFO));
 	m_hCaptureDevice = NULL;
 	m_pImageFrame = ::GetCVImageInterface();
@@ -33,6 +34,8 @@ CCallBackVideo::CCallBackVideo()
 
 CCallBackVideo::~CCallBackVideo()
 {
+	InnerStop();
+
 	SetEvent(m_hEvtForStart);
 	SetEvent(m_hEvtForStop);
 
@@ -194,6 +197,7 @@ LOOPWAIT:
 bool CCallBackVideo::Start()
 {
 	SetEvent(m_hEvtForStart);
+	m_bHasRunning = true;
 	return true;
 }
 
@@ -201,8 +205,13 @@ bool CCallBackVideo::Stop()
 {
 	SetEvent(m_hEvtForStop);
 	ResetEvent(m_hEvtForStart);
+	{
+		CVisAutoLock lk(&m_lkFrame);
+		m_bHasRunning = false;
+	}
 	return true;
 }
+
 
 BOOL WINAPI NotifyEventCallback(DWORD dwEventCode, LPVOID lpEventData, LPVOID lpUserData)
 {
@@ -314,6 +323,11 @@ BOOL CCallBackVideo::DoInit(HANDLE hCaptureDevice)
 
 void CCallBackVideo::onOneFrame(const VIDEO_SAMPLE_INFO & VideoInfo, BYTE *pbData)
 {
+	if (!m_bHasRunning)
+	{
+		return;
+	}
+	CVisAutoLock lk(&m_lkFrame);
 	if (!m_pImageFrame->IsValid())
 	{
 		if (VideoInfo.dwWidth > 0 && VideoInfo.dwHeight > 0)

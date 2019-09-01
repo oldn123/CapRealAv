@@ -106,4 +106,7 @@
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Toolbar.bmp" />
+  </ItemGroup>
 </Project>
