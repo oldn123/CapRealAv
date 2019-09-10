@@ -4,6 +4,7 @@
 //
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
+#define IDS_STARTIMER                   101
 #define ID_STATUSBAR_PANE1              120
 #define ID_STATUSBAR_PANE2              121
 #define IDS_STATUS_PANE1                122
@@ -40,8 +41,8 @@
 #define IDS_FIND_TAB                    302
 #define IDS_EXPLORER                    305
 #define IDR_PANE_BOTTOM_WND             306
-#define	IDR_PANE_RIGHT_WND			308
-#define	IDR_RIGHT_PANE					307
+#define IDR_RIGHT_PANE                  307
+#define IDR_PANE_RIGHT_WND              308
 
 // Next default values for new objects
 // 

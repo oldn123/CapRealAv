@@ -72,6 +72,7 @@ CMainFrame::CMainFrame()
 	m_pImgDenoise	= ::GetCVImageInterface();
 	m_ImgForProc	= ::GetCVImageInterface();
 
+	m_params.nstreamMode = -1;
 	m_params.nScl = -1;
 }
 
@@ -278,6 +279,8 @@ int CMainFrame::ResetParams(int nSrcWidth, int nSrcHeight, CMilliWaveSimulator &
 {
 	CVisAutoLock lk(&m_lkChangeParam);
 
+	WriteLogEx(L"resetparams width: %d, height: %d", nSrcWidth, nSrcHeight);
+
 	bool bfirst = params.fnAlgs.size() < 1;
 
 	float * fDenoiseParams = &params.fDenoiseParams[0];// { params.fDenosie, 5.0f, 5.0f, 3.0f, 1.0f, 1.0f };   // 去噪声的参数，第一个参数需要节目展示，名称：噪声强度，范围是1-100
@@ -315,6 +318,7 @@ int CMainFrame::ResetParams(int nSrcWidth, int nSrcHeight, CMilliWaveSimulator &
 	{
 		// check whether support CUDA device
 		if (gProc.GetGpuInformation()) {
+			WriteLogEx(L"resetparams init gpu faild!");
 			return -1;
 		}
 
@@ -323,11 +327,19 @@ int CMainFrame::ResetParams(int nSrcWidth, int nSrcHeight, CMilliWaveSimulator &
 		if ( !nRet ) {
 			fnAlgs.push_back(alg1);
 		}
+		else 
+		{
+			WriteLogEx(L"resetparams AddGpuAlgorithm VIDEO_BM3D faild!");
+		}
 
 		// 加入超分辨率的算法
 		nRet = gProc.AddGpuAlgorithm(VIDEO_SSR_MKL, 1, fInterpParams);
 		if ( !nRet ) {
 			fnAlgs.push_back(alg2);
+		}
+		else 
+		{
+			WriteLogEx(L"resetparams AddGpuAlgorithm VIDEO_SSR_MKL faild!");
 		}
 	}
 	else
@@ -345,6 +357,7 @@ int CMainFrame::ResetParams(int nSrcWidth, int nSrcHeight, CMilliWaveSimulator &
 	// 图像处理类初始化
 	nRet = gProc.ReInitialize2(nSrcWidth, nSrcHeight, 3, 0, NULL, nScl, nScl);
 	if (nRet != 0) {
+		WriteLogEx(L"resetparams ReInitialize2 faild!");
 		return nRet;
 	}
 	WriteLogEx(L"resetparam1 %d, %d, %d", nRet, nSrcWidth, nSrcHeight);
@@ -418,10 +431,17 @@ void CMainFrame::OnImageFrame(CdvImageInterface * pImage, CdvImageInterface * pD
 		m_ImgForProc->Create(m_params.szOutImgSize, 8, 3);
 	}
 
-	// 视频处理函数，第二个参数是输入图像，第一个参数是输出图像
-	m_gProc.RunGpuAlgorithm(m_ImgForProc->GetData(), pImageForProc->GetData(), m_params.fnAlgs);
+	if (m_params.fnAlgs.size() > 0)
+	{
+		// 视频处理函数，第二个参数是输入图像，第一个参数是输出图像
+		m_gProc.RunGpuAlgorithm(m_ImgForProc->GetData(), pImageForProc->GetData(), m_params.fnAlgs);
 
-	OnSetImage(m_ImgForProc);
+		OnSetImage(m_ImgForProc);
+	}
+	else
+	{
+		OnSetImage(pImageForProc);
+	}
 
 	//WriteLogEx(L"on frame 3~~~");
 }
@@ -434,10 +454,9 @@ void CMainFrame::OnSetImage(CdvImageInterface * pImg)
 
 void CMainFrame::OnRealtimeVideoCallback(int nDevIdx, CdvImageInterface * pImage)
 {
-	if (m_params.fnAlgs.size() < 1)
+	if (m_params.nstreamMode != 0)
 	{
-		PostMessage(UM_CHANGEUIMODE, 0, 0);
-
+		m_params.nstreamMode = 0;
 		InitFrame(pImage->Width(), pImage->Height());
 	}
 
@@ -699,6 +718,11 @@ void WINAPI funImageProcessCallback(void* pParam,CdvImageInterface* pImage,int n
 void WINAPI funImagePreProcessCallback(void* pParam,CdvImageInterface* pImage,CdvImageInterface* pDestImage,int nPos)
 {
 	CMainFrame * pThis = (CMainFrame *)pParam;
+	if (pThis->m_params.nstreamMode != 1)
+	{
+		pThis->m_params.nstreamMode = 1;
+	}
+
 	CVisCommonApi::ExchangeHeight(pImage->GetData(), pImage->GetStep(), pImage->Height());
 	pThis->OnImageFrame(pImage, pDestImage);
 }
@@ -712,7 +736,7 @@ bool CMainFrame::OnStartRealPlay()
 		::MessageBoxW(GetSafeHwnd(), L"连接设备失败！", L"提示", 0);
 		return false;
 	}
-
+	PostMessage(UM_CHANGEUIMODE, 0, 0);
 	return true;
 }
 

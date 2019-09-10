@@ -56,7 +56,10 @@ class CStartPage : public CVisDuiWndBase
 public:
 	CStartPage(CWnd * p){
 		m_pFrameWnd = p;
-		m_timecnt = 3;
+
+		TCHAR st[100] = {0};
+		LoadString(AfxGetInstanceHandle(), IDS_STARTIMER, st, 100);
+		m_timecnt = _ttoi(st);
 	}
 	virtual ~CStartPage(){
 
@@ -85,7 +88,7 @@ public:
 	}
 
 	virtual CDuiString GetSkinFile() override{
-		return L"BatchImgVideoProc\\startpage.xml";
+		return L"ViProc\\startpage.xml";
 	}
 
 	virtual void InitWindow() override{

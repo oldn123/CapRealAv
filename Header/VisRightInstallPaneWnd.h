@@ -15,6 +15,8 @@ struct sParams
 	dvSize	szZoomImgSize;
 	dvSize	szOutImgSize;
 	vector<std::pair<enum eAlgoType, bool>> fnAlgs;
+
+	int		nstreamMode;	//-1,0,1
 };
 
 class ICmdParamNotify
